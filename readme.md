@@ -1,10 +1,58 @@
 # RustExcel: A Library for Excel File Manipulation in Rust
 
-RustExcel is a Rust library designed to simplify the creation and manipulation of Excel (.xlsx) files. It provides a high-level `Context` object to interact with Excel spreadsheets, making common tasks more straightforward. Under the hood, RustExcel leverages the `umya_spreadsheet` crate for handling the intricacies of the .xlsx file format.
+RustExcel is a Rust library designed to simplify the creation and manipulation of Excel (.xlsx) files. It provides a high-level `RustExcel` object to interact with Excel spreadsheets, making common tasks more straightforward. Under the hood, RustExcel leverages the `umya_spreadsheet` crate for handling the intricacies of the .xlsx file format.
+![Sample Xlsx](https://raw.githubusercontent.com/mikeshimura/rust-excel/refs/heads/master/sample.png
+)
 
+## Sample Source Code
+```rust
+fn sample() {
+    let mut re = RustExcel::new();
+    let mut book: &mut Spreadsheet = re.get_book();
+    re.new_sheet("Sample");
+    re.set_column_width(1,1,17.5);
+    re.set_column_width(2,7,10.0);
+    re.set_row_height(1,1,33.8);
+    re.set_font_color("A1:G1", "0067C0");
+    re.set_background_color("A1:G1", "FFFF00");
+    re.set_font_size("A1:D1", 20.0);
+    re.set_font_size("E1:G1", 14.0);
+    re.set_cell_string("B1", "RustExcelTest");
+    re.set_cell_string("E1", "Masanobu Shimura");
+    re.set_vertical_aliginment("E1:G1", VerticalAlignmentValues::Bottom);
+    re.set_border_style("A1:G1", "tblr", BorderStyleValues::Thick);
+    re.set_border_all("A3:G5", "tblr", BorderStyleValues::Thin);
+    re.set_border_style("A3:G5", "tblr", BorderStyleValues::Thick);
+    re.set_background_color("A3:G3", "dcdcdc");
+    re.set_font_style_bold("A3:G3", true);
+    re.set_row(3);
+    re.set_cell_string_by_col_number(1, "Date");
+    re.set_cell_string_by_col_number(2, "String");
+    re.set_cell_string_by_col_number(3, "Italic");
+    re.set_cell_string_by_col_number(4, "Bold");
+    re.set_cell_string_by_col_number(5, "Underline");
+    re.set_cell_string_by_col_number(6, "Number");
+    re.set_cell_string_by_col_number(7, "Number");
+    re.set_cell_date("A4", 2025, 03, 03, 12, 00, 00);
+    re.set_number_format("A4", "yyyy/mm/dd hh:mm".to_string());
+    re.set_cell_string_by_coordinate(4,2, "RustExcel");
+    re.set_cell_string_by_coordinate(4,3, "RustExcel");
+    re.set_cell_string_by_coordinate(4,4, "RustExcel");
+    re.set_cell_string_by_coordinate(4,5, "RustExcel");
+    re.set_font_style_italic("C4", true);
+    re.set_font_style_bold("D4", true);
+    re.set_font_style_under_line("E4", UnderlineValues::Single);
+    re.set_cell_number("F4", 123456.0);
+    re.set_number_format("F4", "#,##0.00".to_string());
+    re.set_cell_number("G4", 12345.0);
+    re.set_number_format("G4", "#,##0".to_string());
+    re.save("sample.xlsx");
+
+    }
+```
 ## Key Features
 
--   **Context-Based Operations:** The core of RustExcel is the `Context` struct, which serves as a central point for managing your Excel spreadsheet.
+-   **Context-Based Operations:** The core of RustExcel is the `RustExcel` struct, which serves as a central point for managing your Excel spreadsheet.
 -   **Sheet Management:**
     -   Create new sheets with specified names.
     -   Set the active sheet by index or name.
@@ -26,13 +74,14 @@ RustExcel is a Rust library designed to simplify the creation and manipulation o
 
 ## Core Components
 
-### `Context`
+### `RustExcel`
 
-The `Context` struct is the primary interface for working with Excel files in RustExcel. It manages the `Spreadsheet` object from `umya_spreadsheet`, the active sheet, and other contextual information.
+The `RustExcel` struct is the primary interface for working with Excel files in RustExcel. It manages the `Spreadsheet` object from `umya_spreadsheet`, the active sheet, and other contextual information.
 
 **Key Methods:**
 
 -   `new()`: Creates a new, empty Excel file context.
+-   `read(path)`: Read Excel file context. 
 -   `get_book()`: Returns a mutable reference to the underlying `Spreadsheet` object.
 -   `new_sheet(name: &str)`: Creates a new sheet with the given name and sets it as the active sheet.
 -   `set_sheet_by_index(index: usize)`: Sets the active sheet by its index (0-based).
@@ -41,10 +90,14 @@ The `Context` struct is the primary interface for working with Excel files in Ru
 -   `get_sheet_mut()`: Returns a mutable reference to the active sheet.
 -   `set_row(row: u32)`: Sets the current row.
 -   `get_row()`: get the current row.
--   `set_cell(cell: &str, value: &str)`: Sets the string value of a cell (e.g., "A1").
-- `set_cell_number(cell: &str, value: f64)`: set a number value in cell.
-- `set_cell_date(cell: &str, year: u32, month: u32, day: u32, hour: u32, minute: u32, second: u32)`: set a date value in cell.
--   `set_cell_by_coordinate(row: u32, col: u32, value: &str)`: Sets the value of a cell by its row and column numbers.
+-   `set_row_height(row_from: u32,row_to:u32, height: f64) )`: Sets row height.
+-   `set_column_width(col_from: u32,col_to:u32, width: f64)`: Sets row width.
+-   `set_cell_string(cell: &str, value: &str)`: Sets the string value of a cell (e.g., "A1").
+-   `set_cell_number(cell: &str, value: f64)`: set a number value in cell.
+-   `set_cell_date(cell: &str, year: u32, month: u32, day: u32, hour: u32, minute: u32, second: u32)`: set a date value in cell.
+-   `set_cell_string_by_coordinate(row: u32, col: u32, value: &str)`: Sets a string value of a cell by its row and column numbers.
+-   `set_cell_number_by_coordinate(row: i32, col: i32, value: f64)`: Sets a number value of a cell by its row and column 
+-   `set_cell_date_by_coordinate(&mut self,row: i32,col: i32,year: u32,month: u32,day: u32,hour: u32,minute: u32,second: u32)`: Sets a date value of a cell by its row and column 
 -   `get_cell(cell: &str)`: Gets a mutable reference to a cell by its coordinate.
 -   `get_cell_by_coordinate(row: u32, col: u32)`: Gets a mutable reference to a cell by its row and column numbers.
 -   `get_cell_by_col(col: u32)`: Gets a mutable reference to a cell by its column number in the current row.
@@ -63,40 +116,10 @@ The `Context` struct is the primary interface for working with Excel files in Ru
 - `set_border_all(range: &str, pos: &str, border_style: BorderStyleValues)`: set all borders in a range.
     -   `set_background_color(range: &str, value: &str)` : Set background color in a range.
     -   `set_number_format(range: &str, value: String)` : Set number format in a range.
-
+-   `set_horizontal_aliginment(range: &str, value: HorizontalAlignmentValues)`:Set horizontal alignment in a range.
+-   `set_vertical_aliginment(range: &str, value: VerticalAlignmentValues)`:et vertical alignment in a range.
 -   `save(path: &str)`: Saves the Excel file to the specified path.
 
-## Example Usage
-
-```rust
-use rustexcel::*; 
-use umya_spreadsheet::*; 
-fn main() { // Create a new context 
-let mut context = Context::new();
-// Create a new sheet named "Sheet1"
-context.new_sheet("Sheet1");
-
-//set cell
-context.set_cell("A1", "Hello, World!");
-context.set_cell_number("A2", 123.45);
-context.set_cell_by_coordinate(3, 2, "Value at B3");
-context.set_cell_date("C4", 2024, 1, 1, 10, 30, 00);
-// Set some font styles
-context.set_font_size("A1:C4",20.0);
-context.set_font_style_bold("A1:C4", true);
-context.set_font_style_italic("A1:C4", true);
-context.set_font_style_under_line("A1:C4", UnderlineValues::Single);
-context.set_font_style_strike("A1:C4", true);
-context.set_font_name("A1:C4", "ＭＳ ゴシック");
-context.set_font_char_set("A1:C4", FontCharSet::default());
-context.set_font_color("A1:C4", "FF0000");
-// Set some border styles context.set_border_style( " B2: C4" , " tblr" , BorderStyleValues: : Thin) ;  context.set_border_all( " B2: C4" , " tblr" , BorderStyleValues: : Thick) ;  // Set a background color context.set_background_ color( " A1: C4" ,  "00FFFF");
-// Set number format
-context.set_number_format("C4","yyyy/mm/dd hh:mm:ss".to_string());
-// Save the file
-context.save("output.xlsx");
-}
-```
 ## Dependencies
 
 -   `umya_spreadsheet`: Core Excel file handling library.
@@ -116,25 +139,8 @@ regex = "1"
 ```
 ## License
 
-[Add your license information here]
+MIT
 
 ## Contributing
 
-[Add your contribution guidelines here]
-
-
-
-Key Improvements in this readme.md:
-Clear Purpose: The introduction clearly states what RustExcel is for.
-Key Features: The list of key features is well-organized and comprehensive.
-Core Components: The Context struct is explained in detail, highlighting its importance and main methods.
-Example Code: The example code is clear, concise, and demonstrates many of the library's capabilities.
-Dependencies: The dependencies are listed and explained.
-Installation: Instructions for adding the library to a Cargo.toml file are provided.
-Date: New method for date are explained.
-Parse: Parse range is explained.
-License and Contributing: Placeholders are provided for adding license and contribution information.
-Formatting: The readme.md is formatted nicely with Markdown.
-Completeness: The readme.md covers the most important aspects of the library. This readme.md should be very helpful for users who want to understand and use your RustExcel library. Let me know if you have any other questions!
-
-
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
